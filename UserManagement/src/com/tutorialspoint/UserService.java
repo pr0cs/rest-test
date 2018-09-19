@@ -3,6 +3,8 @@ package com.tutorialspoint;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -25,23 +27,26 @@ public class UserService {
    private static final String FAILURE_RESULT="<result>failure</result>";
 
 
+   @RolesAllowed("ADMIN")
    @GET
    @Path("/users")
-   @Produces(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_XML)
    public List<User> getUsers(){
       return userDao.getAllUsers();
    }
 
+   @RolesAllowed("WILL")
    @GET
    @Path("/users/{userid}")
-   @Produces(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_XML)
    public User getUser(@PathParam("userid") int userid){
       return userDao.getUser(userid);
    }
 
+   @PermitAll
    @POST
    @Path("/users")
-   @Produces(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_XML)
    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
    public String createUser(@FormParam("id") int id,
       @FormParam("name") String name,
@@ -55,9 +60,10 @@ public class UserService {
       return FAILURE_RESULT;
    }
 
+   @PermitAll
    @PUT
    @Path("/users")
-   @Produces(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_XML)
    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
    public String updateUser(@FormParam("id") int id,
       @FormParam("name") String name,
@@ -71,9 +77,10 @@ public class UserService {
       return FAILURE_RESULT;
    }
 
+   @PermitAll
    @DELETE
    @Path("/users/{userid}")
-   @Produces(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_XML)
    public String deleteUser(@PathParam("userid") int userid){
       int result = userDao.deleteUser(userid);
       if(result == 1){
@@ -82,9 +89,10 @@ public class UserService {
       return FAILURE_RESULT;
    }
 
+   @PermitAll
    @OPTIONS
    @Path("/users")
-   @Produces(MediaType.APPLICATION_JSON)
+   @Produces(MediaType.APPLICATION_XML)
    public String getSupportedOperations(){
       return "<operations>GET, PUT, POST, DELETE</operations>";
    }
