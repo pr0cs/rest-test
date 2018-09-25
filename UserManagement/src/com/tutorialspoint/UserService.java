@@ -1,5 +1,6 @@
 package com.tutorialspoint;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("/UserService")
 public class UserService {
@@ -43,6 +45,19 @@ public class UserService {
       return userDao.getUser(userid);
    }
 
+   @PermitAll
+   @GET
+   @Path("/img")
+   @Produces(MediaType.APPLICATION_OCTET_STREAM)
+   public Response getImage() {
+	   File file = new File("d:\\skunkworks\\sample.jpg");
+	   return Response.ok(file,MediaType.APPLICATION_OCTET_STREAM).header("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"" ) //optional
+			      .build();
+			   
+	   
+   }
+   
+   
    @PermitAll
    @POST
    @Path("/users")

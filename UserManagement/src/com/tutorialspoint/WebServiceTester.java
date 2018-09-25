@@ -1,24 +1,65 @@
 package com.tutorialspoint;
 
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 
 public class WebServiceTester  {
 
    //private Client client;
    private String REST_SERVICE_URL = "http://localhost:8080/UserManagement/rest/UserService/users";
+   private String REST_SERVICE_IMG_URL = "http://localhost:8080/UserManagement/rest/UserService/img";
    private static final String SUCCESS_RESULT="<result>success</result>";
    private static final String PASS = "pass";
    private static final String FAIL = "fail";
 
+   public class LoadImageApp extends Component {
+       
+	    BufferedImage img;
+	    
+	    public void paint(Graphics g) {
+	        g.drawImage(img, 0, 0, null);
+	    }
+	 
+	    public LoadImageApp(File imageFile) {
+	       try {
+	           img = ImageIO.read(imageFile);
+	       } catch (IOException e) {
+	    	   e.printStackTrace();
+	       }
+	 
+	    }
+	 
+	    public Dimension getPreferredSize() {
+	        if (img == null) {
+	             return new Dimension(100,100);
+	        } else {
+	           return new Dimension(img.getWidth(null), img.getHeight(null));
+	       }
+	    }
+   }
    private void init(){
 	   // since the code depends on different users for different levels
 	   // make client per test
@@ -39,7 +80,30 @@ public class WebServiceTester  {
       tester.testAddUser();
       //test delete user Web Service Method
       tester.testDeleteUser();
+      tester.testImage();
    }
+   private void testImage(){
+	   Client client = ClientBuilder.newClient().register(new Authenticator("admin","password"));
+      
+       Builder builder = client
+         .target(REST_SERVICE_IMG_URL)
+         .request(MediaType.APPLICATION_OCTET_STREAM);
+         
+       File imageFile = builder.get(File.class);
+       System.out.println(imageFile.getAbsolutePath());
+      
+      JFrame f = new JFrame("Image from server");
+      f.addWindowListener(new WindowAdapter(){
+          public void windowClosing(WindowEvent e) {
+              System.exit(0);
+          }
+      });
+
+      f.add(new LoadImageApp(imageFile));
+      f.pack();
+      f.setVisible(true);      
+   }
+
    //Test: Get list of all users
    //Test: Check if list is not empty
    private void testGetAllUsers(){
